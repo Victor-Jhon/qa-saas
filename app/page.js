@@ -1,8 +1,11 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export default function Home() {
+  const params = useParams();
+  const projectId = params.id;
   const [projects, setProjects] = useState([]);
   const [name, setName] = useState("");
 
@@ -14,6 +17,7 @@ export default function Home() {
 
   return (
     <div className="p-6">
+      
       <h1 className="text-2xl font-bold mb-4">Projetos</h1>
 
       <div className="mb-4">

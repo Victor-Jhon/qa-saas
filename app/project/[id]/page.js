@@ -1,7 +1,10 @@
 "use client";
 import { useState } from "react";
+import { useParams } from "next/navigation";
 
 export default function ProjectPage() {
+  const params = useParams();
+  const projectId = params.id;
   const [tests, setTests] = useState([]);
   const [title, setTitle] = useState("");
 
@@ -21,6 +24,9 @@ export default function ProjectPage() {
 
   return (
     <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">
+  Casos de Teste - Projeto {projectId}
+      </h1>
       <h1 className="text-2xl font-bold mb-4">Casos de Teste</h1>
 
       <div className="mb-4">
