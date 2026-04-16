@@ -1,69 +1,103 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function ProjectPage() {
   const params = useParams();
-  const projectId = params.id;
+  const projectId = params?.id;
+
   const [tests, setTests] = useState([]);
   const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function addTest() {
-    if (!title) return;
-    setTests([...tests, { id: Date.now(), title, status: "Não testado" }]);
-    setTitle("");
+  useEffect(() => {
+    if (projectId) {
+      console.log("ProjectId:", projectId);
+      fetchTests();
+    }
+  }, []);
+
+  async function fetchTests() {
+    if (!projectId) return;
+    
+    setLoading(true);
+    console.log("Buscando testes para projectId:", projectId);
+    
+    const { data, error } = await supabase
+      .from("test_cases")
+      .select("*")
+      .eq("project_id", projectId);
+
+    console.log("Resultado:", data, error);
+    setTests(data || []);
+    setLoading(false);
   }
 
-  function updateStatus(id, status) {
-    setTests(
-      tests.map((t) =>
-        t.id === id ? { ...t, status } : t
-      )
-    );
+  async function addTest() {
+    if (!title.trim() || !projectId) return;
+
+    const { error } = await supabase.from("test_cases").insert([
+      {
+        title,
+        project_id: projectId,
+        status: "Não testado",
+      },
+    ]);
+
+    if (error) {
+      console.error("Erro ao adicionar:", error);
+      alert("Erro ao adicionar: " + error.message);
+    } else {
+      setTitle("");
+      fetchTests();
+    }
   }
+
+  async function updateStatus(id, status) {
+    const { error } = await supabase
+      .from("test_cases")
+      .update({ status })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Erro ao atualizar:", error);
+    } else {
+      fetchTests();
+    }
+  }
+
+  if (loading) return <div>Carregando...</div>;
+  if (!projectId) return <div>Projeto não encontrado</div>;
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">
-  Casos de Teste - Projeto {projectId}
-      </h1>
-      <h1 className="text-2xl font-bold mb-4">Casos de Teste</h1>
+      <h1>Casos de Teste - Projeto {projectId}</h1>
 
-      <div className="mb-4">
-        <input
-          className="border p-2 mr-2"
-          placeholder="Novo teste"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <button
-          onClick={addTest}
-          className="bg-green-500 text-white px-4 py-2"
-        >
-          Adicionar
-        </button>
-      </div>
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      <button onClick={addTest}>
+        Adicionar
+      </button>
 
       <ul>
         {tests.map((t) => (
-          <li key={t.id} className="mb-3">
-            <span className="mr-4">{t.title}</span>
+          <li key={t.id}>
+            {t.title}
 
-            <button
-              onClick={() => updateStatus(t.id, "Passou")}
-              className="bg-blue-500 text-white px-2 mr-2"
-            >
+            <button onClick={() => updateStatus(t.id, "Passou")}>
               Passou
             </button>
 
-            <button
-              onClick={() => updateStatus(t.id, "Falhou")}
-              className="bg-red-500 text-white px-2 mr-2"
-            >
+            <button onClick={() => updateStatus(t.id, "Falhou")}>
               Falhou
             </button>
 
-            <span>{t.status}</span>
+            {t.status}
           </li>
         ))}
       </ul>
