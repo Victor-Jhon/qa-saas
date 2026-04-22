@@ -1,3 +1,61 @@
+🚀 QA Hub Platform
+
+Plataforma SaaS desenvolvida para gerenciamento e automação de testes de software, com foco em qualidade, produtividade e rastreabilidade de projetos.
+
+⸻
+
+📌 Sobre o projeto
+
+Este projeto tem como objetivo facilitar o fluxo de criação, execução e acompanhamento de testes de software dentro de equipes de desenvolvimento e QA.
+
+A aplicação permite criar projetos, organizar testes e acompanhar o status de execução de forma simples e eficiente.
+
+⸻
+
+⚙️ Funcionalidades
+
+* 📁 Criação e gerenciamento de projetos
+* 🧪 Criação de casos de teste
+* ✅ Status de execução (pendente, em andamento, concluído)
+* ✏️ Edição e exclusão de projetos e testes
+* 📊 Visão geral dos testes por projeto
+* 🔐 Autenticação de usuários (caso esteja implementado)
+* 🌐 Interface web moderna e responsiva
+
+⸻
+
+🛠️ Tecnologias utilizadas
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* Supabase (ou backend escolhido)
+* PostgreSQL
+
+🚧 Melhorias futuras
+
+* 📈 Dashboard com métricas avançadas de QA
+* 🤖 Integração com IA para geração de casos de teste
+* 🔔 Sistema de notificações
+* 👥 Controle de permissões por equipe
+* 📱 Melhorias na versão mobile
+
+⸻
+
+👨‍💻 Autor
+
+Desenvolvido por Victor Jhon
+Projeto pessoal focado em aprendizado e evolução na área de QA e desenvolvimento de software.
+
+⸻
+
+📄 Licença
+
+Este projeto está sob a licença MIT.
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
