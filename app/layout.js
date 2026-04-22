@@ -42,7 +42,7 @@ export default function RootLayout({ children }) {
 
   {/* TOPO */}
   <div>
-    <h1 className="text-xl font-bold mb-8">QA SaaS</h1>
+    <h1 className="text-xl font-bold mb-8">QA Hub</h1>
 
     <nav className="flex flex-col gap-2">
       <Link href="/projects" className={linkClass("/projects")}>
