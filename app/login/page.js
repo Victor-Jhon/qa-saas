@@ -14,7 +14,7 @@ export default function LoginPage() {
     supabase.auth.getUser().then(({ data }) => {
       if (data?.user) {
         // Redireciona para a página de projetos (ajuste o id se necessário)
-        router.replace("/project/1");
+        router.replace("/project");
       }
     });
   }, [router]);

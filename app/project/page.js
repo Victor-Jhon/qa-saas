@@ -12,14 +12,21 @@ export default function ProjectsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    // Verifica se o usuário está autenticado
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data?.user) {
+        router.replace("/login");
+      } else {
+        fetchProjects();
+      }
+    });
+  }, [router]);
 
   async function fetchProjects() {
     setLoading(true);
     const { data, error } = await supabase.from("projects").select("*");
     if (!error) setProjects(data || []);
-    alert("Erro ao buscar projetos: " + error.message);
+    if (error) alert("Erro ao buscar projetos: " + error.message);
     setLoading(false);
   }
 
@@ -28,9 +35,11 @@ export default function ProjectsPage() {
     setLoading(true);
     const { data, error } = await supabase
       .from("projects")
-      .insert([{ name }])
+      .insert([{ nome: name }]) // Corrigido para campo correto
       .select();
-    if (!error && data && data[0]) {
+    if (error) {
+      alert("Erro ao criar projeto: " + error.message);
+    } else if (data && data[0]) {
       setProjects([...projects, data[0]]);
       setName("");
     }
