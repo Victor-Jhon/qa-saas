@@ -48,7 +48,7 @@ export default function ProjectPage() {
       {
         title,
         project_id: projectId,
-        status: "pendente", // ✔ PADRÃO CORRETO
+        status: "pendentes", // ✔ PADRÃO CORRETO
       },
     ]);
 
@@ -78,8 +78,7 @@ export default function ProjectPage() {
   // ✔ PADRONIZADO (AGORA FUNCIONA COM DASHBOARD)
   const passed = tests.filter((t) => t.status === "passou").length;
   const failed = tests.filter((t) => t.status === "falhou").length;
-  const pending = tests.filter((t) => t.status === "pendente").length;
-
+  const pending = tests.filter((t) => t.status === "pendentes").length;
   return (
     <div>
 
@@ -191,8 +190,8 @@ export default function ProjectPage() {
             className="bg-white p-6 rounded-2xl shadow-xl w-80"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-semibold mb-4">
-              Novo Teste
+            <h2 className="text-lg font-semibold mb-4 text-gray-900">
+            Novo Teste
             </h2>
 
             <input
@@ -200,12 +199,15 @@ export default function ProjectPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Nome do teste"
-              className="border p-2 w-full mb-4 rounded"
+              className="border border-gray-300 p-2 w-full mb-4 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             <div className="flex justify-end gap-2">
-              <button onClick={() => setIsOpen(false)}>
-                Cancelar
+              <button
+              onClick={() => setIsOpen(false)}
+              className="px-4 py-2 text-gray-700 hover:text-gray-900"
+              >
+               Cancelar
               </button>
 
               <button

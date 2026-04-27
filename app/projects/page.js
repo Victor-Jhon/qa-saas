@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState([]);
+  const [tests, setTests] = useState([]); // 🔥 NOVO
+  const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
-  const [openModal, setOpenModal] = useState(false);
+  const [description, setDescription] = useState("");
   const [editingProject, setEditingProject] = useState(null);
-
   const router = useRouter();
 
   useEffect(() => {
@@ -17,152 +19,223 @@ export default function ProjectsPage() {
   }, []);
 
   async function fetchProjects() {
-    const { data } = await supabase.from("projects").select("*");
-    setProjects(data || []);
+    const { data: projectsData } = await supabase
+      .from("projects")
+      .select("*");
+
+    const { data: testsData } = await supabase
+      .from("test_cases")
+      .select("*");
+
+    setProjects(projectsData || []);
+    setTests(testsData || []);
   }
 
-  // 🔵 CRIAR / EDITAR
-  async function handleSave() {
+  // 🔥 MÉTRICAS POR PROJETO
+  function getMetrics(projectId) {
+    const projectTests = tests.filter(
+      (t) => t.project_id === projectId
+    );
+
+    const normalize = (s) => s?.toLowerCase().trim();
+
+    const passed = projectTests.filter(
+      (t) => normalize(t.status) === "passou"
+    ).length;
+
+    const failed = projectTests.filter(
+      (t) => normalize(t.status) === "falhou"
+    ).length;
+
+    const pending = projectTests.filter((t) => {
+      const s = normalize(t.status);
+      return s.includes("pendente") || s.includes("não") || s.includes("nao");
+    }).length;
+
+    return {
+      total: projectTests.length,
+      passed,
+      failed,
+      pending,
+    };
+  }
+
+  async function saveProject() {
     if (!name) return;
 
     if (editingProject) {
-      const { error } = await supabase
+      await supabase
         .from("projects")
-        .update({ name })
+        .update({ name, description })
         .eq("id", editingProject.id);
-
-      if (error) {
-        alert("Erro ao atualizar projeto");
-        return;
-      }
     } else {
-      const { error } = await supabase
+      await supabase
         .from("projects")
-        .insert([{ name }]);
-
-      if (error) {
-        alert("Erro ao criar projeto");
-        return;
-      }
+        .insert([{ name, description }]);
     }
 
     setName("");
+    setDescription("");
     setEditingProject(null);
-    setOpenModal(false);
+    setIsOpen(false);
     fetchProjects();
   }
 
-  // 🔴 DELETE
   async function deleteProject(id) {
-    const confirmDelete = window.confirm("Deseja excluir este projeto?");
+    const confirmDelete = confirm("Excluir projeto?");
     if (!confirmDelete) return;
 
-    const { error } = await supabase
-      .from("projects")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      alert("Erro ao excluir projeto");
-      return;
-    }
-
+    await supabase.from("projects").delete().eq("id", id);
     fetchProjects();
+  }
+
+  function openEditModal(project) {
+    setEditingProject(project);
+    setName(project.name);
+    setDescription(project.description || "");
+    setIsOpen(true);
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6 text-gray-900 tracking-tight">
-        Projetos
-       </h1>
-      {/* BOTÃO NOVO PROJETO */}
-      <button
-        onClick={() => {
-          setOpenModal(true);
-          setEditingProject(null);
-          setName("");
-        }}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-6"
-      >
-        + Novo Projeto
-      </button>
+    <motion.div
+      className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
 
-      {/* CARDS */}
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-white">
+          Projetos
+        </h1>
+
+        <motion.button
+          onClick={() => {
+            setIsOpen(true);
+            setEditingProject(null);
+            setName("");
+            setDescription("");
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl"
+        >
+          + Novo Projeto
+        </motion.button>
+      </div>
+
+      {/* GRID */}
       <div className="grid md:grid-cols-3 gap-4">
-        {projects.map((p) => (
-          <div
-            key={p.id}
-            className="bg-gray-300 p-5 rounded-xl shadow hover:shadow-lg transition relative"
-          >
-            <h2 className="font-bold text-lg text-gray-900">
-              {p.name}
-            </h2>
 
-          {/* AÇÕES */}
-            <div className="flex gap-2 mt-4">
-              <button
-                onClick={() => {
-                  setEditingProject(p);
-                  setName(p.name);
-                  setOpenModal(true);
-                }}
-                className="text-blue-600"
-              >
-                ✏️
-              </button>
+        {projects.map((p, i) => {
+          const metrics = getMetrics(p.id); // 🔥 AQUI
 
-              <button
-                onClick={() => deleteProject(p.id)}
-                className="text-red-600"
-              >
-                🗑️
-              </button>
+          return (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ scale: 1.05 }}
+              className="group bg-white/10 backdrop-blur-lg border border-white/10 p-5 rounded-2xl text-white"
+            >
 
-              <button
+              <div
                 onClick={() => router.push(`/project/${p.id}`)}
-                className="text-gray-600 ml-auto"
+                className="cursor-pointer"
               >
-                Abrir →
-              </button>
-            </div>
-          </div>
-        ))}
+                <h2 className="font-bold text-lg">
+                  {p.name}
+                </h2>
+
+                <p className="text-sm text-gray-400 mt-1 line-clamp-2">
+                  {p.description || "Sem descrição"}
+                </p>
+
+                {/* 🔥 MÉTRICAS */}
+                <p className="text-xs text-gray-400 mt-3">
+                  {metrics.total} testes •{" "}
+                  <span className="text-green-400">{metrics.passed} ✔</span>{" "}
+                  •{" "}
+                  <span className="text-red-400">{metrics.failed} ✖</span>{" "}
+                  •{" "}
+                  <span className="text-yellow-400">{metrics.pending} ⏳</span>
+                </p>
+              </div>
+
+              {/* AÇÕES */}
+              <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition">
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => openEditModal(p)}
+                  className="bg-white/10 hover:bg-white/20 p-2 rounded-lg text-white"
+                >
+                  ✏️
+                </motion.button>
+
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => deleteProject(p.id)}
+                  className="bg-red-500/20 hover:bg-red-500/40 p-2 rounded-lg text-red-400"
+                >
+                  🗑️
+                </motion.button>
+              </div>
+
+            </motion.div>
+          );
+        })}
+
       </div>
 
       {/* MODAL */}
-      {openModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl w-[400px]">
-
-            <h2 className="text-lg font-bold mb-4">
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => setIsOpen(false)}
+        >
+          <div
+            className="bg-white p-6 rounded-2xl shadow-xl w-80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-semibold mb-4 text-gray-900">
               {editingProject ? "Editar Projeto" : "Novo Projeto"}
             </h2>
 
             <input
+              autoFocus
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Nome do projeto"
-              className="w-full border p-2 rounded mb-4"
+              className="border border-gray-300 p-2 w-full mb-3 rounded-lg text-gray-900"
+            />
+
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descrição do projeto"
+              className="border border-gray-300 p-2 w-full mb-4 rounded-lg text-gray-900 resize-none"
             />
 
             <div className="flex justify-end gap-2">
               <button
-                onClick={() => setOpenModal(false)}
-                className="px-3 py-1"
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
               >
                 Cancelar
               </button>
 
               <button
-                onClick={handleSave}
-                className="bg-blue-600 text-white px-4 py-2 rounded"
+                onClick={saveProject}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg"
               >
-                Salvar
+                {editingProject ? "Salvar" : "Criar"}
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+
+    </motion.div>
   );
 }
