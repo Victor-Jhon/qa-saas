@@ -16,7 +16,7 @@ export default function Home() {
 
     if (data.user) {
       // 👉 logado
-      router.push("/projects"); 
+      router.push("/dashboard"); 
       // ou "/dashboard" se preferir
     } else {
       // 👉 não logado

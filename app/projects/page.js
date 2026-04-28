@@ -13,23 +13,27 @@ export default function ProjectsPage() {
   const [description, setDescription] = useState("");
   const [editingProject, setEditingProject] = useState(null);
   const router = useRouter();
-
+  const [notes, setNotes] = useState(""); 
   useEffect(() => {
     fetchProjects();
   }, []);
 
   async function fetchProjects() {
-    const { data: projectsData } = await supabase
-      .from("projects")
-      .select("*");
+  const { data: projectsData } = await supabase
+    .from("projects")
+    .select("*")
+    .order("created_at", { ascending: true });
 
-    const { data: testsData } = await supabase
-      .from("test_cases")
-      .select("*");
+  console.log("PROJECTS:", projectsData); // 🔥 AQUI
 
-    setProjects(projectsData || []);
-    setTests(testsData || []);
-  }
+  const { data: testsData } = await supabase
+    .from("test_cases")
+    .select("*")
+    .order("created_at", { ascending: true });
+
+  setProjects(projectsData || []);
+  setTests(testsData || []);
+}
 
   // 🔥 MÉTRICAS POR PROJETO
   function getMetrics(projectId) {
@@ -49,7 +53,7 @@ export default function ProjectsPage() {
 
     const pending = projectTests.filter((t) => {
       const s = normalize(t.status);
-      return s.includes("pendente") || s.includes("não") || s.includes("nao");
+      return s.includes("pendentes") || s.includes("não") || s.includes("nao");
     }).length;
 
     return {
