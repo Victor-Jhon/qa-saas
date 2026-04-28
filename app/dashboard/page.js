@@ -34,20 +34,20 @@ export default function Dashboard() {
     setLoading(false);
   }
 
- const normalize = (status) =>
-  status?.toLowerCase().trim();
+  const normalize = (status) =>
+    status?.toLowerCase().trim();
 
-const passed = tests.filter((t) =>
-  normalize(t.status).includes("pass")
-).length;
+  const passed = tests.filter((t) =>
+    normalize(t.status).includes("pass")
+  ).length;
 
-const failed = tests.filter((t) =>
-  normalize(t.status).includes("falh")
-).length;
+  const failed = tests.filter((t) =>
+    normalize(t.status).includes("falh")
+  ).length;
 
-const pending = tests.filter((t) =>
-  normalize(t.status).includes("pend")
-).length;
+  const pending = tests.filter((t) =>
+    normalize(t.status).includes("pend")
+  ).length;
 
   const total = tests.length;
 
@@ -77,48 +77,60 @@ const pending = tests.filter((t) =>
       className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
     >
 
       <h1 className="text-3xl font-bold text-white mb-6">
         Dashboard
       </h1>
 
-      {/* CARDS */}
-      <div className="grid md:grid-cols-4 gap-4 mb-6">
+      {/* 🔥 SEÇÃO PROJETOS */}
+      <div className="mb-6">
+        <h2 className="text-white text-lg mb-3 opacity-80">
+          📁 Projetos
+        </h2>
 
         <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-white/10 backdrop-blur-lg border border-white/10 p-5 rounded-2xl text-white"
+          whileHover={{ scale: 1.03 }}
+          className="bg-white/10 backdrop-blur-lg border border-white/10 p-5 rounded-2xl text-white w-full md:w-1/4"
         >
-          <p className="text-sm opacity-70">Projetos</p>
-          <h2 className="text-2xl font-bold">{projects}</h2>
+          <p className="text-sm opacity-70">Total de projetos</p>
+          <h2 className="text-3xl font-bold">{projects}</h2>
         </motion.div>
+      </div>
 
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-green-500/20 backdrop-blur-lg border border-green-400/20 p-5 rounded-2xl text-green-300"
-        >
-          <p className="text-sm">Passaram</p>
-          <h2 className="text-2xl font-bold">{passed}</h2>
-        </motion.div>
+      {/* 🔥 SEÇÃO TESTES */}
+      <div className="mb-6">
+        <h2 className="text-white text-lg mb-3 opacity-80">
+          🧪 Testes Totais
+        </h2>
 
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-red-500/20 backdrop-blur-lg border border-red-400/20 p-5 rounded-2xl text-red-300"
-        >
-          <p className="text-sm">Falharam</p>
-          <h2 className="text-2xl font-bold">{failed}</h2>
-        </motion.div>
+        <div className="grid md:grid-cols-3 gap-4">
 
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="bg-yellow-500/20 backdrop-blur-lg border border-yellow-400/20 p-5 rounded-2xl text-yellow-300"
-        >
-          <p className="text-sm">Pendentes</p>
-          <h2 className="text-2xl font-bold">{pending}</h2>
-        </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-green-500/20 border border-green-400/20 p-5 rounded-2xl text-green-300"
+          >
+            <p className="text-sm opacity-80">Passaram</p>
+            <h2 className="text-2xl font-bold">{passed}</h2>
+          </motion.div>
 
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-red-500/20 border border-red-400/20 p-5 rounded-2xl text-red-300"
+          >
+            <p className="text-sm opacity-80">Falharam</p>
+            <h2 className="text-2xl font-bold">{failed}</h2>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="bg-yellow-500/20 border border-yellow-400/20 p-5 rounded-2xl text-yellow-300"
+          >
+            <p className="text-sm opacity-80">Pendentes</p>
+            <h2 className="text-2xl font-bold">{pending}</h2>
+          </motion.div>
+
+        </div>
       </div>
 
       {/* GRID */}
@@ -126,12 +138,8 @@ const pending = tests.filter((t) =>
 
         {/* GRÁFICO */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
           className="bg-white/10 backdrop-blur-lg border border-white/10 p-6 rounded-2xl"
         >
-
           <h2 className="text-white text-lg mb-4">
             Status dos Testes
           </h2>
@@ -146,17 +154,12 @@ const pending = tests.filter((t) =>
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-
         </motion.div>
 
         {/* PERFORMANCE */}
         <motion.div
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
           className="bg-white/10 backdrop-blur-lg border border-white/10 p-6 rounded-2xl text-white"
         >
-
           <h2 className="text-lg mb-4">
             Performance
           </h2>
@@ -171,7 +174,7 @@ const pending = tests.filter((t) =>
 
           <div className="mt-4 w-full bg-gray-700 rounded-full h-3">
             <div
-              className="bg-green-400 h-3 rounded-full transition-all duration-500"
+              className="bg-green-400 h-3 rounded-full"
               style={{ width: `${successRate}%` }}
             />
           </div>
